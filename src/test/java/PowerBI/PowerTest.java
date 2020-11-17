@@ -10,11 +10,13 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.net.URL;
@@ -53,7 +55,7 @@ public class PowerTest {
 //        PowerBISession = null;
 //    }
 
-    @Test
+    @org.junit.Test
     public void click() throws InterruptedException, IOException {
 
 
@@ -113,13 +115,27 @@ public class PowerTest {
 //        }
     }
 
-    public void parserColumn() throws IOException {
-                   PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
+    public void parserColumn() throws IOException, InterruptedException {
+        Thread.sleep(5000);
+
+        ArrayList<String> tabs2 = new ArrayList<String>(PowerBISession.getWindowHandles());
+        PowerBISession.switchTo().window(tabs2.get(0));
+
+
+
+
+
+        Actions actions = new Actions(PowerBISession);
+        actions.click();
+        PowerBISession.findElementByName("Enter Data").click();
+
+        Test test = new Test();
+        actions.moveToElement(PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName"))).perform();
+        actions.click();
         File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
+         test.ReadClipboard(temp.getAbsolutePath());
 
-
-
-        String fileName = temp.getName();
+         String fileName = temp.getName();
         Optional<String> line = Files.lines(Paths.get(fileName)).findFirst();
         System.out.println(line.get());
 

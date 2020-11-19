@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,13 @@ public class PowerTest {
 
     private static WindowsDriver PowerBISession = null;
 
+
+
     WebDriverWait wait = new WebDriverWait(PowerBISession, 100);
+
+    Actions actions = new Actions(PowerBISession);
+
+    Test test = new Test();
 
     @BeforeClass
     public static void setup() {
@@ -47,21 +54,21 @@ public class PowerTest {
         }
     }
 
-//    @AfterClass
-//    public static void TearDown() {
-//        if (PowerBISession != null) {
-//            PowerBISession.quit();
-//        }
-//        PowerBISession = null;
-//    }
+    @AfterClass
+    public static void TearDown() {
+        if (PowerBISession != null) {
+            PowerBISession.quit();
+        }
+        PowerBISession = null;
+    }
 
     @org.junit.Test
     public void click() throws InterruptedException, IOException {
-
-
+        Thread.sleep(1000);
         PowerBISession.findElementByName("Close").click();
         PowerBISession.findElementByName("Get data").click();
         PowerBISession.findElementByName("OData feed").click();
+        Thread.sleep(1000);
         PowerBISession.findElementByClassName("Internet Explorer_Server").sendKeys(ConfProperties.getProperty("URLforDataSource"));
         PowerBISession.findElementByName("OK").click();
 
@@ -69,13 +76,8 @@ public class PowerTest {
         //inputReg();
 
         selectData();
-        parserColumn();
-
-
-//        PowerBISession.findElementByName("Load").click();
-//        wait.until(ExpectedConditions.invisibilityOf(PowerBISession.findElementByName("Load")));
-//        Thread.sleep(3000);
-//        PowerBISession.findElementByName("Data").click();
+//        parserColumn();
+        parserCell();
     }
 
 
@@ -87,32 +89,14 @@ public class PowerTest {
         PowerBISession.findElementByName("Connect").click();
     }
 
-    public void selectData() {
+    public void selectData() throws InterruptedException {
 
         Actions actions = new Actions(PowerBISession);
-        //PowerBISession.findElement(By.name("Level 2, " + ConfProperties.getProperty("TableName"))).click();
         actions.contextClick(PowerBISession.findElement(By.name("Level 2, " + ConfProperties.getProperty("TableName")))).perform();
         actions.moveToElement(PowerBISession.findElementByName("Transform Data, 1 of 2.")).perform();
+        Thread.sleep(1000);
         PowerBISession.getKeyboard().sendKeys(Keys.ENTER);
 
-
-
-
-//            PowerBISession.findElementByName("Level 1, https://powerbi-cloud-prod.alphaservesp.com/api/export/power-bi/8b75174d1d13d27f13da3cd47f7dae8d")
-//                    .click();
-//            for (int i = 0; i < 30; i++) {
-//            PowerBISession.getKeyboard().sendKeys(Keys.SHIFT,Keys.ARROW_DOWN);
-//        }
-
-
-            //PowerBISession.findElementByName("Level 2," + " " + retval).sendKeys(Keys.LEFT_CONTROL, Keys.ENTER);
-
-
-//        String str = ConfProperties.getProperty("JiraCoreSections");
-//        String[] arr = str.split(",");
-//        for (String retval : arr){
-//            if ()
-//        }
     }
 
     public void parserColumn() throws IOException, InterruptedException {
@@ -121,23 +105,75 @@ public class PowerTest {
         ArrayList<String> tabs2 = new ArrayList<String>(PowerBISession.getWindowHandles());
         PowerBISession.switchTo().window(tabs2.get(0));
 
+        try {
+            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
 
+        }
+        catch (NoSuchElementException e){
+            PowerBISession.findElementByName("View").click();
+            PowerBISession.findElementByName("Go to Column").click();
+            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
+            PowerBISession.getKeyboard().sendKeys(Keys.ENTER);
+        }
 
+        PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
+        actions.contextClick().perform();
+        PowerBISession.getKeyboard().sendKeys(Keys.ARROW_DOWN);
+        PowerBISession.getKeyboard().sendKeys(Keys.ENTER);
 
-
-        Actions actions = new Actions(PowerBISession);
-        actions.click();
-        PowerBISession.findElementByName("Enter Data").click();
-
-        Test test = new Test();
-        actions.moveToElement(PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName"))).perform();
-        actions.click();
         File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
-         test.ReadClipboard(temp.getAbsolutePath());
+        test.ReadClipboard(temp.getAbsolutePath());
 
-         String fileName = temp.getName();
-        Optional<String> line = Files.lines(Paths.get(fileName)).findFirst();
-        System.out.println(line.get());
+    }
+
+    public void parserString() throws InterruptedException, IOException {
+        Thread.sleep(5000);
+
+        ArrayList<String> tabs2 = new ArrayList<String>(PowerBISession.getWindowHandles());
+        PowerBISession.switchTo().window(tabs2.get(0));
+
+        try {
+            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
+
+        } catch (NoSuchElementException e){
+            PowerBISession.findElementByName("View").click();
+            PowerBISession.findElementByName("Go to Column").click();
+            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
+            PowerBISession.getKeyboard().sendKeys(Keys.ENTER);
+        }
+
+        PowerBISession.getKeyboard().sendKeys(Keys.LEFT_ALT,Keys.ARROW_DOWN);
+        PowerBISession.getKeyboard().pressKey(Keys.LEFT_ALT);
+
+
+        PowerBISession.findElementByName("Text Filters").click();
+        PowerBISession.findElementByName("Begins With...").click();
+
+        PowerBISession.findElementByName("Value for Clause 1, Enter or select a value").click();
+        Thread.sleep(3000);
+        PowerBISession.getKeyboard().sendKeys(ConfProperties.getProperty("ValueCell"));
+        PowerBISession.getKeyboard().sendKeys(Keys.ENTER);
+        PowerBISession.findElementByName("OK").click();
+
+        PowerBISession.findElementByName("Table actions").click();
+        PowerBISession.findElementByName("Copy Entire Table, 1 of 20.").click();
+
+        File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
+        test.ReadClipboard(temp.getAbsolutePath());
+
+    }
+
+    public void parserCell() throws IOException, InterruptedException {
+            parserString();
+            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnNameForCell")).click();
+            PowerBISession.getKeyboard().sendKeys(Keys.ARROW_DOWN,Keys.ARROW_DOWN);
+            PowerBISession.getKeyboard().sendKeys(Keys.LEFT_CONTROL,"c");
+
+
+        File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
+        test.ReadClipboard(temp.getAbsolutePath());
+
+
 
     }
 

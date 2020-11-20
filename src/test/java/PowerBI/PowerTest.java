@@ -10,32 +10,20 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.Key;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.net.URL;
 import io.appium.java_client.windows.WindowsDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 
 
 public class PowerTest {
 
     private static WindowsDriver PowerBISession = null;
 
-
     Actions actions = new Actions(PowerBISession);
 
-    Test test = new Test();
+    CopyToBuffer test = new CopyToBuffer();
 
     @BeforeClass
     public static void setup() {
@@ -70,8 +58,6 @@ public class PowerTest {
         PowerBISession.findElementByClassName("Internet Explorer_Server").sendKeys(ConfProperties.getProperty("URLforDataSource"));
         PowerBISession.findElementByName("OK").click();
 
-        //if (PowerBISession.findElementByName("SQL Server database").isDisplayed())
-        //inputReg();
 
         selectData();
 
@@ -89,14 +75,6 @@ public class PowerTest {
         }
     }
 
-
-    public void inputReg() {
-        PowerBISession.findElementByName("Credentials").click();
-        PowerBISession.findElementByName("Basic").click();
-        PowerBISession.findElementByName("User name").sendKeys("kliuchkovskii_weSuVq");
-        PowerBISession.findElementByName("Password").sendKeys("19961225");
-        PowerBISession.findElementByName("Connect").click();
-    }
 
     public void selectData() throws InterruptedException {
 
@@ -172,9 +150,33 @@ public class PowerTest {
     }
 
     public void createAndWriteFile() throws IOException {
+        File bind = File.createTempFile("test","txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
+
+        String[] arr = new String[10];
+
         File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
         test.ReadClipboard(temp.getAbsolutePath());
+
+        try {
+            File file = new File(temp.getAbsolutePath());
+
+            FileReader fr = new FileReader(file);
+
+            BufferedReader reader = new BufferedReader(fr);
+
+            String line = reader.readLine();
+            while (line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
 
     public void searchingValueInColumn() throws InterruptedException {
 
@@ -198,4 +200,6 @@ public class PowerTest {
 
         PowerBISession.findElementByName("OK").click();
     }
+
+
 }

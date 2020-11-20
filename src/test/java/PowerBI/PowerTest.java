@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.net.URL;
+
 import io.appium.java_client.windows.WindowsDriver;
 
 
@@ -61,7 +62,7 @@ public class PowerTest {
 
         selectData();
 
-        if(ConfProperties.getProperty("ParsingParameters").equals("string")) {
+        if (ConfProperties.getProperty("ParsingParameters").equals("string")) {
             parserString();
         }
         if (ConfProperties.getProperty("ParsingParameters").equals("column")) {
@@ -69,8 +70,7 @@ public class PowerTest {
         }
         if (ConfProperties.getProperty("ParsingParameters").equals("cell")) {
             parserCell();
-        }
-        else {
+        } else {
             System.out.println("Invalid value.Please select string, column or cell");
         }
     }
@@ -116,17 +116,17 @@ public class PowerTest {
     }
 
     public void parserCell() throws IOException, InterruptedException {
-            switchWindow();
+        switchWindow();
 
-            searchingValueInColumn();
+        searchingValueInColumn();
 
-            PowerBISession.findElementByName(ConfProperties.getProperty("ColumnNameForCell")).click();
-            actions.sendKeys(Keys.ARROW_DOWN,Keys.ARROW_DOWN).perform();
-            actions.sendKeys(Keys.LEFT_CONTROL,"c").perform();
-            actions.sendKeys(Keys.LEFT_CONTROL).perform();
+        PowerBISession.findElementByName(ConfProperties.getProperty("ColumnNameForCell")).click();
+        actions.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_DOWN).perform();
+        actions.sendKeys(Keys.LEFT_CONTROL, "c").perform();
+        actions.sendKeys(Keys.LEFT_CONTROL).perform();
 
 
-            createAndWriteFile();
+        createAndWriteFile();
 
     }
 
@@ -141,7 +141,7 @@ public class PowerTest {
         try {
             PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
 
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             PowerBISession.findElementByName("View").click();
             PowerBISession.findElementByName("Go to Column").click();
             PowerBISession.findElementByName(ConfProperties.getProperty("ColumnName")).click();
@@ -150,40 +150,16 @@ public class PowerTest {
     }
 
     public void createAndWriteFile() throws IOException {
-        File bind = File.createTempFile("test","txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
-
-        String[] arr = new String[10];
-
-        File temp = File.createTempFile("temp",".txt",new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
+        File temp = File.createTempFile("temp", ".txt", new File("C:\\Project\\PowerBIauto\\src\\test\\resources"));
         test.ReadClipboard(temp.getAbsolutePath());
-
-        try {
-            File file = new File(temp.getAbsolutePath());
-
-            FileReader fr = new FileReader(file);
-
-            BufferedReader reader = new BufferedReader(fr);
-
-            String line = reader.readLine();
-            while (line != null) {
-                System.out.println(line);
-                line = reader.readLine();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
-
-
 
     public void searchingValueInColumn() throws InterruptedException {
 
         searchColumn();
 
 
-        actions.sendKeys(Keys.LEFT_ALT,Keys.ARROW_DOWN).perform();
+        actions.sendKeys(Keys.LEFT_ALT, Keys.ARROW_DOWN).perform();
         actions.sendKeys(Keys.LEFT_ALT).perform();
 
 
@@ -193,10 +169,6 @@ public class PowerTest {
         PowerBISession.findElementByName("Value for Clause 1, Enter or select a value").click();
         Thread.sleep(3000);
         PowerBISession.getKeyboard().sendKeys(ConfProperties.getProperty("ValueCell"));
-
-
-
-//        PowerBISession.getKeyboard().sendKeys(ConfProperties.getProperty("ValueCell"));
 
         PowerBISession.findElementByName("OK").click();
     }
